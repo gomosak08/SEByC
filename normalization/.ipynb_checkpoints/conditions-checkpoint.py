@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-import re
-import warnings
-warnings.filterwarnings("ignore")
+
 
 def assign_equations(df, modelos, variable_resultado="p", conditions=None):
     """
@@ -50,7 +48,7 @@ def assign_equations(df, modelos, variable_resultado="p", conditions=None):
         raise ValueError(f'{conditions} is not known. The only available options are "biomasa", "carbono", "densidad".')
 
     # Filter the models to only include those with the desired variable result
-    equations = modelos[(modelos.variable_resultado == variable_resultado) & (modelos.activo == 1)]
+    equations = modelos[modelos.variable_resultado == variable_resultado]
 
     # Initialize an array to store the equations
     n = len(df)
@@ -65,9 +63,10 @@ def assign_equations(df, modelos, variable_resultado="p", conditions=None):
             # Apply the condition to filter equations
             equation_df = condition(equations, row)
             if not equation_df.empty:
-                equation = find_max_criteria_row(equation_df)
+                return equation_df
+                equation = select_eq(df)
                 # If a match is found, assign the equation and break
-                p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
+                p_eq[index] = equation_df.iloc[0, 5]  # The 6th column is selected here
                 flag = True
                 break
         if not flag:
@@ -78,70 +77,8 @@ def assign_equations(df, modelos, variable_resultado="p", conditions=None):
 
     return p_eq
 
-def find_max_criteria_row(df):
-    """
-    Finds the row in the DataFrame `df` that satisfies the maximum or minimum criteria for 
-    several specific columns. It checks for the following criteria in order:
-    
-    1. The minimum difference between 'diametro_max' and 'diametro_min'.
-    2. The maximum value in the 'r2' column.
-    3. The maximum value in the 'numero_arboles' column.
-    4. The maximum number of unique variables in the 'ecuacion' column.
-    
-    The function returns the first row that satisfies any of these criteria.
 
-    Parameters:
-    ----------
-    df : pandas.DataFrame
-        The DataFrame containing the columns 'diametro_max', 'diametro_min', 'r2', 'numero_arboles', 
-        and 'ecuacion'.
-
-    Returns:
-    -------
-    pandas.Series or str
-        The row from the DataFrame that meets the first of the specified criteria.
-        If no criteria are met, it returns a message indicating no matches.
-    """
-
-    def count_variables(expression):
-        """
-        Counts the number of unique variables in a mathematical expression.
-
-        Parameters:
-        ----------
-        expression : str
-            The mathematical expression as a string.
-
-        Returns:
-        -------
-        int
-            The number of unique variables in the expression.
-        """
-        potential_vars = re.findall(r'\b[a-zA-Z_]\w*\b', expression)
-        functions_and_constants = {'Exp', 'LN'}
-        variables = [var for var in potential_vars if var not in functions_and_constants]
-        unique_variables = set(variables)
-        return len(unique_variables)
-
-    # Calculate variable counts for each row in the 'ecuacion' column
-    variable_counts = df['ecuacion'].apply(count_variables)
-
-    # Find indices for the specified criteria
-    indices = [
-        (df['diametro_max'] - df['diametro_min']).idxmin(),  # Minimum range
-        df['r2'].idxmax(),                                   # Maximum r2
-        df['numero_arboles'].idxmax(),                       # Maximum number of trees
-        variable_counts.idxmax()                             # Maximum variables
-    ]
-    # Iterate over indices and return the first valid row
-    for index in indices:
-        if not np.isnan(index):
-            return df.loc[index]
-
-    # If no valid index is found, return a message
-    return "This does not have eq that match the conditions"
-
-def volumen(df_muerto, df_tocon, modelos, lon):
+def volumen(df_muerto, df_tocon, modelos):
     """
     Assigns specific equations based on conditions to the `v_eq` array.
 
@@ -165,7 +102,8 @@ def volumen(df_muerto, df_tocon, modelos, lon):
     """
 
     # Initialize the result array with the size of both dataframes combined
-    v_eq = np.empty(lon, dtype=object)
+    n = len(df_muerto) + len(df_tocon)
+    v_eq = np.empty(n, dtype=object)
 
     # Process the df_muerto dataframe
     for index, row in df_muerto.iterrows():
@@ -177,10 +115,9 @@ def volumen(df_muerto, df_tocon, modelos, lon):
             eq = modelos.iloc[2884, 5]
             eq += f"/{row.grado_putrefaccion}"
             print(eq, index)
-            v_eq[index] = eq
+            v_eq[index + len(df_muerto)] = eq
         else:
-            #print(index)
-            v_eq[index] = modelos.iloc[2884, 5]
+            v_eq[index + len(df_muerto)] = modelos.iloc[2884, 5]
 
     return v_eq
 # Conditions
@@ -349,5 +286,3 @@ densidad = [
     (lambda df,row: df[(df.genero == row.genero)]),
     (lambda df,row: df[df.clave_ecoregion_n2 == row.clave_ecoregion_n2]) 
 ]
-
-

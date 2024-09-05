@@ -27,10 +27,10 @@ def main(args):
 
 
     # Remove rows where both 'altura' and 'diametro' are NaN
+    dropped_indices = df_not_nulls[(df_not_nulls['altura'].isnull()) & (df_not_nulls['diametro'].isnull())].index
     df_not_nulls = df_not_nulls[~(df_not_nulls['altura'].isnull() & df_not_nulls['diametro'].isnull())]
 
     # Add 'is_predicted' column with all zeros
-
 
     # Apply regression for each condition and save to CSV
     conditions = ["Vivo","Muerto"]
@@ -40,6 +40,7 @@ def main(args):
     index = df_not_nulls.index
 
     df.loc[index] = df_not_nulls
+    df.loc[dropped_indices, ["diametro", "altura"]] = np.nan
  
     
     df.to_csv(args.output_file,index=False)

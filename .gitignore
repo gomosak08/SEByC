@@ -1,12 +1,18 @@
+*.csv
 csvs/**/*.csv
 /*.csv
 csvs/**/*.xlsx
 
 .ipybn_checkpoints
 __pychache__
-* .npy
-* .csv
-
+*.npy
+*.csv
+labs/*.cvs
 d_eq.npy
 p_eq.npy
-linear_regression/ciclo1_out.csv
+linear_regression/**/*.csv
+# Ignore all contents inside the 'runs' directory
+runs/*
+
+# But do not ignore the 'runs' directory itself
+!runs/

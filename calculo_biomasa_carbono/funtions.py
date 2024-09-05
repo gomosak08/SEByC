@@ -1,4 +1,7 @@
 import math
+import pandas as pd
+import numpy as np
+from tqdm import tqdm
 
 def str2function(function, equation_type):
     """
@@ -67,63 +70,73 @@ def str2function(function, equation_type):
 
     return lambda_function, filtered_list
 
-import pandas as pd
-import numpy as np
 
-def calculate_values(df):
+def calculate_values(df, calculate=["volumen", "biomasa", "carbono"]):
     """
     Calculates volume, biomass, and carbon based on equations provided in the DataFrame.
 
     ### Parameters:
     - **df** (`pd.DataFrame`): DataFrame containing the data along with the equations for volume, biomass, and carbon.
+    - **calculate** (`list` of `str`): List of strings indicating which values to calculate. 
+      Options include "volumen", "biomasa", and "carbono". Default is to calculate all.
 
     ### Returns:
-    - **df** (`pd.DataFrame`): The input DataFrame with additional columns for calculated volume, biomass, and carbon.
+    - **df** (`pd.DataFrame`): The input DataFrame with additional columns for calculated volume, biomass, and carbon 
+      based on the specified calculation.
 
     ### Notes:
     - The function uses the `str2function` helper to dynamically convert equation strings to lambda functions.
     - The function handles different variable combinations based on the equations and assigns the calculated values to the corresponding columns.
     """
 
-    # Initialize the result columns
-    df['volumen'] = np.nan
-    df['biomasa'] = np.nan
-    df['carbono'] = np.nan
+    # Initialize the result columns if they are specified in the calculate list
+    if "volumen" in calculate:
+        df['volumen'] = np.nan
+    if "biomasa" in calculate:
+        df['biomasa'] = np.nan
+    if "carbono" in calculate:
+        df['carbono'] = np.nan
 
-    # Iterate over the DataFrame to calculate volume
-    for index, row in df.iterrows():
-        try:
-            f, var = str2function(row.volumen_eq, "vol")
-            df.at[index, 'volumen'] = f(row.diametro, row.altura)
-        except:
-            pass
+    if "volumen" in calculate:
+        for row in tqdm(df.itertuples(), total=len(df)):
+            index = row.Index
+            try:
+                if not pd.isnull(row.volumen_eq):
+                    f, var = str2function(row.volumen_eq, "vol")
+                    df.at[index, 'volumen'] = f(row.diametro, row.altura)
+            except Exception as e:
+                print(f"Error calculating volume at index {index}: {e}")
 
-    # Iterate over the DataFrame to calculate biomass
-    for index, row in df.iterrows():
-        try:
-            f, var = str2function(row.biomasa_eq, "bio")
-            if var == ['densi', 'd130', 'ht']:
-                df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.diametro, row.altura)
-            elif var == ['d130', 'ht']:
-                df.at[index, 'biomasa'] = f(row.diametro, row.altura)
-            elif var == ['densi', 'v']:
-                df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.volumen)
-            else:
-                df.at[index, 'biomasa'] = f(row.diametro)
-        except Exception as e:
-            print(f"Error calculating biomass at index {index}: {e}")
+    # Iterate over the DataFrame to calculate biomass if specified
+    if "biomasa" in calculate:
+        for row in tqdm(df.itertuples(), total=len(df)):
+            index = row.Index
+            try:
+                f, var = str2function(row.biomasa_eq, "bio")
+                if var == ['densi', 'd130', 'ht']:
+                    df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.diametro, row.altura)
+                elif var == ['d130', 'ht']:
+                    df.at[index, 'biomasa'] = f(row.diametro, row.altura)
+                elif var == ['densi', 'v']:
+                    df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.volumen)
+                else:
+                    df.at[index, 'biomasa'] = f(row.diametro)
+            except Exception as e:
+                print(f"Error calculating biomass at index {index}: {e}")
 
-    # Iterate over the DataFrame to calculate carbon
-    for index, row in df.iterrows():
-        try:
-            f, var = str2function(row.carbon_eq, "car")
-            if var == ['b']:
-                df.at[index, 'carbono'] = f(row.biomasa)
-            elif var == ['d130']:
-                df.at[index, 'carbono'] = f(row.diametro)
-            else:
-                df.at[index, 'carbono'] = f(row.diametro, row.altura)
-        except Exception as e:
-            print(f"Error calculating carbon at index {index}: {e}")
+    # Iterate over the DataFrame to calculate carbon if specified
+    if "carbono" in calculate:
+        for row in tqdm(df.itertuples(), total=len(df)):
+            index = row.Index
+            try:
+                f, var = str2function(row.carbon_eq, "car")
+                if var == ['b']:
+                    df.at[index, 'carbono'] = f(row.biomasa)
+                elif var == ['d130']:
+                    df.at[index, 'carbono'] = f(row.diametro)
+                else:
+                    df.at[index, 'carbono'] = f(row.diametro, row.altura)
+            except Exception as e:
+                print(f"Error calculating carbon at index {index}: {e}")
 
     return df
