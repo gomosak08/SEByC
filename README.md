@@ -36,3 +36,17 @@ To address missing values, open the `lab_missing_data.ipynb` Jupyter notebook. T
 ### Automating the Process
 
 If you prefer to run all the steps at once, you can execute the `calculate_all.py` script. This script automates the entire workflow, from data preparation to final calculations. Keep in mind that depending on your computer’s performance and the size of your dataset, this process may take some time.
+
+
+├── calculate.sh    
+├── calculo_biomasa_carbono   
+│   ├── bio_car.py  
+│   └── funtions.py  
+├── linear_regression   
+│   ├── calculate.py   
+│   ├── README.md   
+│   └── regresion.py  
+├── normalization   
+│   ├── asignation.py   
+│   └── conditions.py   
+└── runs

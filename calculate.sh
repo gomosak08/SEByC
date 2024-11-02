@@ -37,7 +37,7 @@ echo "Missing data calculated"
 
 echo "Start to assign the equations to the dataframe runs/run_${next_run}/regression_${next_run}_head.csv"
 
- 
+
 
 if ! python3 normalization/asignation.py --modelo_path csvs/modelo2.csv \
  --regresion_path runs/run_${next_run}/regression_${next_run}_head.csv \
