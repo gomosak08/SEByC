@@ -1,9 +1,6 @@
 # New Start: Biomass and Carbon Calculation Project
 
 **Author:** Kevin Saúl Gómez Molina  
-**Email:** [gomosak@outlook.es](mailto:gomosak@outlook.es)  
-**LinkedIn:** [Kevin Saúl Gómez Molina](https://www.linkedin.com/in/kevin-sa%C3%BAl-g-73455b1b1/)  
-**GitHub:** [gomosak08](https://github.com/gomosak08)
 
 If you have any questions or need further assistance with this project, feel free to reach out via any of the contact options above.
 
