@@ -104,6 +104,8 @@ def calculate_values(df, calculate=["volumen", "biomasa", "carbono"]):
                 if not pd.isnull(row.volumen_eq):
                     f, var = str2function(row.volumen_eq, "vol")
                     df.at[index, 'volumen'] = f(row.diametro, row.altura)
+                else:
+                    pass
             except Exception as e:
                 print(f"Error calculating volume at index {index}: {e}")
 
@@ -123,6 +125,8 @@ def calculate_values(df, calculate=["volumen", "biomasa", "carbono"]):
                     df.at[index, 'biomasa'] = f(row.diametro)
             except Exception as e:
                 print(f"Error calculating biomass at index {index}: {e}")
+                print(row.biomasa_eq)
+
 
     # Iterate over the DataFrame to calculate carbon if specified
     if "carbono" in calculate:

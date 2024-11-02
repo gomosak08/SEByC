@@ -7,12 +7,10 @@ csvs/**/*.xlsx
 __pychache__
 *.npy
 *.csv
-labs/*.cvs
+labs/**/*.cvs
 d_eq.npy
 p_eq.npy
 linear_regression/**/*.csv
 # Ignore all contents inside the 'runs' directory
 runs/*
-
-# But do not ignore the 'runs' directory itself
 !runs/

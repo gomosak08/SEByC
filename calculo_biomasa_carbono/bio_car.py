@@ -5,13 +5,13 @@ from funtions import calculate_values
 
 def main(args):
     df = pd.read_csv(args.origina_path, low_memory=False)
-    modelos = pd.read_excel(args.modelo_path)
+    modelos = pd.read_csv(args.modelo_path)
 
     #carbon_eq = np.load("c_eq.npy", allow_pickle=True)
-    biomasa_eq  = np.load(f'{args.output_dir}/b_eq.npy', allow_pickle=True)
-    densidad_eq = np.load(f'{args.output_dir}/p_eq.npy', allow_pickle=True)
-    volumen_eq  = np.load(f'{args.output_dir}/v_eq.npy', allow_pickle=True)
-    volumen_eq  = np.load(f'{args.output_dir}/c_eq.npy', allow_pickle=True)
+    #biomasa_eq  = np.load(f'{args.output_dir}/b_eq.npy', allow_pickle=True)
+    #densidad_eq = np.load(f'{args.output_dir}/p_eq.npy', allow_pickle=True)
+    #volumen_eq  = np.load(f'{args.output_dir}/v_eq.npy', allow_pickle=True)
+    #volumen_eq  = np.load(f'{args.output_dir}/c_eq.npy', allow_pickle=True)
 
     #print(len(biomasa_eq),len(df), df.columns)
     
@@ -35,3 +35,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
     #python3 bio_car.py --origina_path ../csvs/ciclo_1.csv --modelo_path ../csvs/modelos.xlsx --output_file calculo_biomasa.csv
+
+#python3 calculo_biomasa_carbono/bio_car.py --origina_path runs/run_34/normalizaded_34_head.csv  --modelo_path csvs/modelos.xlsx \
+#--output_file runs/run_34/calculo_bio_car_34_head.csv --output_dir runs/run_34/npy/
+

@@ -5,20 +5,14 @@ import re
 import warnings
 warnings.filterwarnings("ignore")
 
-def assign_equations(df, modelos, variable_resultado="p", conditions=None):
+def assign_equations(df, equations, vector=None, conditions=None):
     """
     Assigns equations based on specific conditions and fills in a result array.
 
     ### Parameters:
     - **df** (`pd.DataFrame`): The DataFrame containing the main dataset.
-    - **modelos** (`pd.DataFrame`): The DataFrame containing the equation models.
-    - **variable_resultado** (`str`): The variable to filter in the models DataFrame. Default is "p".
-    - **conditions** (`list of functions`): A list of functions that define the conditions to filter models. Each function should take in the `modelos` DataFrame and a row from `df` and return a filtered DataFrame. Default conditions are:
-        1. Match `genero` and `epiteto`.
-        2. Match `genero` and when `epiteto` is missing.
-        3. Match only `genero`.
-        4. Match only `clave_ecoregion_n2`.
-
+    - **modelos** (`pd.DataFrame`): The DataFrame containing the equation models for the specific resultado
+    - **conditions** (`list of functions`): A list of functions that define the conditions to filter models. Each function should take in the `modelos` DataFrame and a row from `df` and return a filtered DataFrame. 
     ### Returns:
     - **np.ndarray**: An array containing the assigned equations based on the provided conditions.
 
@@ -44,17 +38,13 @@ def assign_equations(df, modelos, variable_resultado="p", conditions=None):
         conditions_eq = biomasa
     elif conditions == "carbono":
         conditions_eq = carbono
-    elif conditions == "densidad":
-        conditions_eq = densidad
     else:
         raise ValueError(f'{conditions} is not known. The only available options are "biomasa", "carbono", "densidad".')
 
     # Filter the models to only include those with the desired variable result
-    equations = modelos[(modelos.variable_resultado == variable_resultado) & (modelos.activo == 1)]
 
     # Initialize an array to store the equations
-    n = len(df)
-    p_eq = np.empty(n, dtype=object)
+    p_eq = vector
 
     # Iterate over each row in the main dataframe
     #for index, row in df.iterrows():
@@ -65,6 +55,12 @@ def assign_equations(df, modelos, variable_resultado="p", conditions=None):
             # Apply the condition to filter equations
             equation_df = condition(equations, row)
             if not equation_df.empty:
+                if (equation_df['Funciones'] == 'alometrica').any():
+                    equation_df['Funciones'].isin(['alometrica']).idxmax() 
+                    equation = equation_df.loc[equation_df['Funciones'].isin(['alometrica']).idxmax()]
+                    p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
+                    flag = True
+                    break
                 equation = find_max_criteria_row(equation_df)
                 # If a match is found, assign the equation and break
                 p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
@@ -73,10 +69,35 @@ def assign_equations(df, modelos, variable_resultado="p", conditions=None):
         if not flag:
             # Print the index if no condition matched
             print(f"No match found for index: {index}")
-            print(conditions)
+            print(condition)
             break
-
     return p_eq
+
+
+
+
+def assign_den(df, equations, vector=None):
+    conditions_eq = densidad
+    p_eq = vector
+    for row in tqdm(df.itertuples(), total=len(df)):
+        index = row.Index
+        flag = False
+        for condition in conditions_eq:
+            equation_df = condition(equations, row)
+            if not equation_df.empty:
+                #print(index, p_eq)
+                equation = equation_df.iloc[0]
+                p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
+                flag = True
+                break
+        if not flag:
+            # Print the index if no condition matched
+            print(f"No match found for index: {index}")
+            print(condition)
+            break
+    return p_eq
+
+
 
 def find_max_criteria_row(df):
     """
@@ -169,18 +190,18 @@ def volumen(df_muerto, df_tocon, modelos, lon):
 
     # Process the df_muerto dataframe
     for index, row in df_muerto.iterrows():
-        v_eq[index] = modelos.iloc[2883, 5]
+        v_eq[index] = modelos.iloc[2883, 6]
 
     # Process the df_tocon dataframe
     for index, row in df_tocon.iterrows():
         if not np.isnan(row.grado_putrefaccion):
-            eq = modelos.iloc[2884, 5]
+            eq = modelos.iloc[2884, 6]
             eq += f"/{row.grado_putrefaccion}"
-            print(eq, index)
+            #print(eq, index)
             v_eq[index] = eq
         else:
             #print(index)
-            v_eq[index] = modelos.iloc[2884, 5]
+            v_eq[index] = modelos.iloc[2884, 6]
 
     return v_eq
 # Conditions
