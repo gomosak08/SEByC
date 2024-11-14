@@ -26,22 +26,22 @@ def main(args):
 
     # Data Cleaning: Filling missing or invalid values based on conditions
     # Set height to 0.3 for 'Tocón' condition if height is <= 0 or NaN
-    df_original.loc[(df_original.condicion == "Tocón") & (df_original.altura <= 0), "altura"] = .3
+    df_original.loc[(df_original.condicion == "Tocón") & (df_original.altura < .3), "altura"] = .3
     df_original.loc[(df_original.condicion == "Tocón") & (df_original.altura.isnull()), "altura"] = .3
 
     # Set diameter to 7.5 for 'Tocón' condition if diameter is <= 0 or NaN
-    df_original.loc[(df_original.condicion == "Tocón") & (df_original.diametro <= 0), "diametro"] = 7.5
+    df_original.loc[(df_original.condicion == "Tocón") & (df_original.diametro < 7.5), "diametro"] = 7.5
     df_original.loc[(df_original.condicion == "Tocón") & (df_original.diametro.isnull()), "diametro"] = 7.5
 
     # Repeat similar logic for 'Muerto' and 'Vivo' conditions with different default values
-    df_original.loc[(df_original.condicion == "Muerto") & (df_original.diametro <= 0), "diametro"] = 7.5
+    df_original.loc[(df_original.condicion == "Muerto") & (df_original.diametro < 7.5), "diametro"] = 7.5
     df_original.loc[(df_original.condicion == "Muerto") & (df_original.diametro.isnull()), "diametro"] = 7.5
-    df_original.loc[(df_original.condicion == "Muerto") & (df_original.altura <= 0), "altura"] = 1.3
+    df_original.loc[(df_original.condicion == "Muerto") & (df_original.altura < 1.3), "altura"] = 1.3
     df_original.loc[(df_original.condicion == "Muerto") & (df_original.altura.isnull()), "altura"] = 1.3
 
-    df_original.loc[(df_original.condicion == "Vivo") & (df_original.diametro <= 0), "diametro"] = 7.5
+    df_original.loc[(df_original.condicion == "Vivo") & (df_original.diametro < 7.5), "diametro"] = 7.5
     df_original.loc[(df_original.condicion == "Vivo") & (df_original.diametro.isnull()), "diametro"] = 7.5
-    df_original.loc[(df_original.condicion == "Vivo") & (df_original.altura <= 0), "altura"] = 1.3
+    df_original.loc[(df_original.condicion == "Vivo") & (df_original.altura <= 1.3), "altura"] = 1.3
     df_original.loc[(df_original.condicion == "Vivo") & (df_original.altura.isnull()), "altura"] = 1.3
 
     # Initialize equation vectors to store computed values
@@ -55,6 +55,7 @@ def main(args):
     df_original_tocon = df_original[df_original.condicion == "Tocón"]
     v_eq = volumen(df_original_muerto, df_original_tocon, modelos, n)
 
+    #print(v_eq)
     # Process biomass equations for 'Vivo' data
     data = df_original[df_original.condicion == "Vivo"]
     eq = modelos[(modelos["variable_resultado"] == "b") & (modelos["activo"] == 1)]
@@ -83,7 +84,6 @@ def main(args):
     # Assign density equations
     eq = modelos[(modelos["variable_resultado"] == "p") & (modelos["activo"] == 1)]
     p_eq = assign_den(df_original, eq, vector=p_eq)
-
     # Add computed equations to the original dataframe
     df_original["carbon_eq"] = c_eq
     df_original["biomasa_eq"] = b_eq

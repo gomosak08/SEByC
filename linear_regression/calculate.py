@@ -25,23 +25,23 @@ def main(args):
 
     # Make a copy of DataFrame to work with
     df_not_nulls = df.copy()
-    print(df.iloc[0])
+    #print(df.iloc[0])
 
     # Filter out unrealistic 'altura' (height) and 'diametro' (diameter) values
-    df_not_nulls.loc[(df_not_nulls['altura'] <= args.min_altura) & (df_not_nulls.condicion != "Tocón"), 'altura'] = np.nan
-    df_not_nulls.loc[(df_not_nulls['altura'] >= args.max_altura) & (df_not_nulls.condicion != "Tocón"), 'altura'] = np.nan
+    df_not_nulls.loc[(df_not_nulls['altura'] < args.min_altura) & (df_not_nulls.condicion != "Tocón"), 'altura'] = np.nan
+    df_not_nulls.loc[(df_not_nulls['altura'] > args.max_altura) & (df_not_nulls.condicion != "Tocón"), 'altura'] = np.nan
 
     # Apply height filters specific to 'Tocón' condition
-    df_not_nulls.loc[(df_not_nulls['altura'] <= args.min_altura_tocon) & (df_not_nulls.condicion == "Tocón"), 'altura'] = np.nan
-    df_not_nulls.loc[(df_not_nulls['altura'] >= args.max_altura_tocon) & (df_not_nulls.condicion == "Tocón"), 'altura'] = np.nan
+    df_not_nulls.loc[(df_not_nulls['altura'] < args.min_altura_tocon) & (df_not_nulls.condicion == "Tocón"), 'altura'] = np.nan
+    df_not_nulls.loc[(df_not_nulls['altura'] > args.max_altura_tocon) & (df_not_nulls.condicion == "Tocón"), 'altura'] = np.nan
 
     # Filter diameter by min and max thresholds
-    df_not_nulls.loc[(df_not_nulls['diametro'] <= args.min_diametro), 'diametro'] = np.nan
-    df_not_nulls.loc[(df_not_nulls['diametro'] >= args.max_diametro), 'diametro'] = np.nan
+    df_not_nulls.loc[(df_not_nulls['diametro'] < args.min_diametro), 'diametro'] = np.nan
+    df_not_nulls.loc[(df_not_nulls['diametro'] > args.max_diametro), 'diametro'] = np.nan
 
     # Remove rows where both 'altura' and 'diametro' are NaN
     df_not_nulls = df_not_nulls[~(df_not_nulls['altura'].isnull() & df_not_nulls['diametro'].isnull())]
-    print(df_not_nulls.iloc[0])
+    #print(df_not_nulls.iloc[0])
 
     # Define conditions to process: 'Vivo' and 'Muerto'
     conditions = ["Vivo", "Muerto"]
@@ -57,14 +57,18 @@ def main(args):
     # Apply general regression for each condition to further estimate missing values
     for condition in conditions:
         print(f'Calculating general missing data for {condition}')
-        df_not_nulls_general = regression_all(df_not_nulls.loc[idex_null], condition)
-
+        try:
+            df_not_nulls_general = regression_all(df_not_nulls.loc[idex_null], condition)
+        except ValueError as e:
+            print(f"An error occurred with item {condition}: {e}")
     # Update the original dataframe with filled values
     index = df_not_nulls.index
     df.loc[index] = df_not_nulls
-    index = df_not_nulls_general.index
-    df.loc[index] = df_not_nulls_general
-
+    try:
+        index = df_not_nulls_general.index
+        df.loc[index] = df_not_nulls_general
+    except:
+        pass
     # Save processed dataframes to CSV
     df.to_csv(args.output_file, index=False)
     df_not_nulls.to_csv("regression_drop_nps.csv")

@@ -13,4 +13,3 @@ p_eq.npy
 linear_regression/**/*.csv
 # Ignore all contents inside the 'runs' directory
 runs/*
-!runs/

@@ -49,8 +49,8 @@ def str2function(function, equation_type):
 
     variable_sets = {
         "vol": ["d130", "ht"],
-        "bio": ["densi", "v", "d130", "ht"],
-        "car": ["b", "d130", "ht"]
+        "bio": ["densi", "v", "d130", "ht", "p"],
+        "car": ["b", "d130", "ht","p"]
     }
 
     # Validate equation_type
@@ -115,12 +115,15 @@ def calculate_values(df, calculate=["volumen", "biomasa", "carbono"]):
             index = row.Index
             try:
                 f, var = str2function(row.biomasa_eq, "bio")
+                #print(var)
                 if var == ['densi', 'd130', 'ht']:
                     df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.diametro, row.altura)
                 elif var == ['d130', 'ht']:
                     df.at[index, 'biomasa'] = f(row.diametro, row.altura)
                 elif var == ['densi', 'v']:
                     df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.volumen)
+                elif var == ['d130', 'ht', 'p']:
+                    df.at[index, 'biomasa'] = f(float(row.densidad_eq), row.diametro, row.densidad_eq)
                 else:
                     df.at[index, 'biomasa'] = f(row.diametro)
             except Exception as e:
