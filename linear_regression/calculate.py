@@ -18,7 +18,7 @@ def main(args):
 
     # Load data
     df = pd.read_csv(args.file_path, low_memory=False, index_col=False)
-
+    print(len(df))
     # Initialize 'is_predicted' column to mark if data is predicted
     is_predicted = np.zeros(len(df))
     df.insert(16, 'is_predicted', is_predicted)

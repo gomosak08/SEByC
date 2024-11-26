@@ -17,12 +17,12 @@ def main(args):
     """
 
     # Load data
-    df_original = pd.read_csv(args.regresion_path, low_memory=False)
+    df_original = pd.read_csv(args.origina_path, low_memory=False)
     modelos = pd.read_csv(args.modelo_path)
     print("All the files were opened correctly")
     
     # Total number of rows in the data
-    n = len(df_original)
+    n = args.len_df
 
     # Data Cleaning: Filling missing or invalid values based on conditions
     # Set height to 0.3 for 'Tocón' condition if height is <= 0 or NaN
@@ -71,7 +71,7 @@ def main(args):
         index = row.Index
         if not np.isnan(row.grado_putrefaccion):
             eq = modelos.iloc[2884, 6]
-            eq += f"/{row.grado_putrefaccion} * p"
+            eq += f"/{row.grado_putrefaccion} * [p]"
             b_eq[index] = eq
         else:
             b_eq[index] = modelos.iloc[2884, 6]
@@ -84,11 +84,15 @@ def main(args):
     # Assign density equations
     eq = modelos[(modelos["variable_resultado"] == "p") & (modelos["activo"] == 1)]
     p_eq = assign_den(df_original, eq, vector=p_eq)
+
+    print(p_eq[-10:])
+
     # Add computed equations to the original dataframe
-    df_original["carbon_eq"] = c_eq
-    df_original["biomasa_eq"] = b_eq
-    df_original["densidad_eq"] = p_eq
-    df_original["volumen_eq"] = v_eq
+    df_original.loc[:,"carbon_eq"] = c_eq
+    df_original.loc[:,"biomasa_eq"] = b_eq
+    df_original.loc[:,"densidad_eq"] = p_eq
+    df_original.loc[:,"volumen_eq"] = v_eq
+
 
     # Save the processed dataframe to CSV
     df_original.to_csv(args.output_file, index=False)
@@ -100,9 +104,10 @@ if __name__ == "__main__":
 
     # Define arguments
     parser.add_argument('--modelo_path',    type=str, help="Path to the CSV file containing the model equations.")
-    parser.add_argument('--regresion_path', type=str, help="Path to the CSV file containing the regression data.")
+    parser.add_argument('--origina_path', type=str, help="Path to the CSV file containing the regression data.")
     parser.add_argument('--output_file', type=str, default="out.csv", help="Path for the output CSV file.")
-    parser.add_argument('--output_dir', type=str, help="Directory for output .npy files (if applicable).")
+    parser.add_argument('--len_df', type=int, help ="The len of the df" )
+    #parser.add_argument('--output_dir', type=str, help="Directory for output .npy files (if applicable).")
 
     # Parse arguments and execute the main function
     args = parser.parse_args()

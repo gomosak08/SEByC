@@ -1,0 +1,6 @@
+ipykernel==6.29.5
+ipython==8.26.0
+numpy==1.26.4
+pandas==2.2.2
+tqdm==4.66.5
+scikit-learn==1.5.1

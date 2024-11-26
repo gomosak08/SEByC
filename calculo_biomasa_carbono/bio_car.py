@@ -17,7 +17,7 @@ def main(args):
 
     # Load the original data and the model equations
     df = pd.read_csv(args.origina_path, low_memory=False)
-    modelos = pd.read_csv(args.modelo_path)
+    #modelos = pd.read_csv(args.modelo_path)
 
 
     # Apply calculations for biomass, volume, and carbon based on model equations
@@ -33,9 +33,9 @@ if __name__ == "__main__":
     
     # Define arguments for file paths and output directory
     parser.add_argument('--origina_path', type=str, help="Path to the CSV file of the original data in the cycle")
-    parser.add_argument('--modelo_path', type=str, help="Path to the CSV file containing model equations")
+    #parser.add_argument('--modelo_path', type=str, help="Path to the CSV file containing model equations")
     parser.add_argument('--output_file', type=str, default="out.csv", help="Path for the output CSV file")
-    parser.add_argument('--output_dir', type=str, help="Path for output .npy files if needed")
+    #parser.add_argument('--output_dir', type=str, help="Path for output .npy files if needed")
 
     # Parse arguments and execute the main function
     args = parser.parse_args()

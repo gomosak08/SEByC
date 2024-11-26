@@ -93,8 +93,7 @@ def assign_den(df, equations, vector=None):
         if not flag:
             # Print the index if no condition matched
             print(f"No match found for index: {index}")
-            print(condition)
-            break
+            p_eq[index] = "0.5"
     return p_eq
 
 

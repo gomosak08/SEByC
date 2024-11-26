@@ -49,8 +49,8 @@ def str2function(function, equation_type):
 
     variable_sets = {
         "vol": ["d130", "ht"],
-        "bio": ["densi", "v", "d130", "ht", "p"],
-        "car": ["b", "d130", "ht","p"]
+        "bio": ["densi", "v", "d130", "ht"],
+        "car": ["b", "d130", "ht"]
     }
 
     # Validate equation_type
