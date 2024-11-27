@@ -26,7 +26,7 @@ set -e
 
 
 echo "Linear regression start to calculate the missing data herre $global_path/$original_path "
-if ! python3 linear_regression/calculate.py --file_path "$global_path/$original_path" \
+if ! python3 linear_regression/linear_regresion.py --file_path "$global_path/$original_path" \
  --output_file "runs/run_${next_run}/regression_${next_run}_head.csv"; then
     echo "Error: Linear regression failed to calculate the missing data" >&2
     exit 1

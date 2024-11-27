@@ -49,7 +49,7 @@ To set up your environment, ensure you have Python installed on your system. The
 2. Create a virtual environment
     ```bash
     python3 -m venv env
-    source env/bin/activate  # On Windows, use `env\Scripts\activate`
+    source env/bin/activate  
 3. Install the required dependencies:
     ```bash
     pip install -r requirements.txt
@@ -59,31 +59,32 @@ To set up your environment, ensure you have Python installed on your system. The
     pip freeze
 You are now ready to begin working on the project.
 
+For a **T3.xlarge** instance on AWS, you can run the `setup.sh` script after cloning the repository. This script creates a virtual environment and installs all the necessary dependencies.
 
 
 ## **Step-by-Step Workflow**
 
 ### **Step 1: Calculate Cycle Data**
 
-First, run the `calculate.py` script. This script processes raw input data for each cycle and generates the initial dataset.
+First, run the `linear_regresion.py` script. This script tandardize the data and fill in any missing information..
 ```bash
-python calculate.py
+python linear_regresion.py --file_path <input_file_path> --output_file <output_file_path>
 ```
 
-### **Step 2: Data Normalization**
+### **Step 2: Model Assignation**
 
-Execute the `normalization.py` script to standardize the data and fill in any missing information.
+Execute the `asignation.py` script to  assign models for calculating biomass, density, volume, and carbon. s
 
 ```bash
-python normalization.py
+python asignation.py ---model_path <model_file_path> --original_path <original_data_path> --output_file <output_file_path> --len_df <dataframe_length>
 ```
 
-### **Step 3: Model Assignment for Biomass and Carbon Calculations**
+### **Step 3: Model Calculus for Biomass and Carbon Calculations**
 
 Run the `asignation_tree.py` script to assign models for calculating biomass, density, volume, and carbon.
 
 ```bash
-python asignation_tree.py
+python asignation_tree.py --origina_path --output_file
 ```
 
 ### **Step 4: Calculate Biomass and Carbon**
@@ -91,19 +92,16 @@ python asignation_tree.py
 Run the `calculo_biomasa_carbono.py` script to calculate biomass and carbon for your dataset.
 
 ```bash
-python calculo_biomasa_carbono.py
+python calculo_biomasa_carbono.py --original_path <original_data_path> --output_file <output_file_path>
 ```
-
-### Step 5: Handling Missing Data
-
-To address missing values, open the `lab_missing_data.ipynb` Jupyter notebook. This notebook provides tools for identifying and correcting incomplete data, ensuring that your dataset is as comprehensive as possible.
-
----
 ### Automating the Process
 
-If you prefer to run all the steps at once, you can execute the `calculate_all.py` script. This script automates the entire workflow, from data preparation to final calculations. Keep in mind that depending on your computer’s performance and the size of your dataset, this process may take some time.
+If you prefer to run all the steps at once, you can execute the ```calculate.sh``` script. This script automates the entire workflow, from data preparation to final calculations. Keep in mind that the process may take some time, depending on your computer’s performance and the size of your dataset.
 
+To use the ```calculate.sh``` script, provide the CSV path containing the data you want to use for biomass and carbon calculations.
 
+├── csvs        
+│   └── modelos2.csv       
 ├── calculate.sh    
 ├── calculo_biomasa_carbono   
 │   ├── bio_car.py  
