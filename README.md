@@ -48,7 +48,7 @@ To set up your environment, ensure you have Python installed on your system. The
    cd SEByC
 2. Create a virtual environment
     ```bash
-    python -m venv env
+    python3 -m venv env
     source env/bin/activate  # On Windows, use `env\Scripts\activate`
 3. Install the required dependencies:
     ```bash

@@ -1,15 +1,13 @@
-#!/bin/zsh
+#!/bin/bash
 
-# Get the original path from the first argument
+# Get the current working directory and store it in a variable
 original_path=$1
-setopt NULL_GLOB
-global_path="/home/gomosak/conafor/SEByc"
+
+global_path=$(pwd)
+echo "$global_path/env/bin/activate"
 
 # Activate the Python virtual environment
-source /home/gomosak/cnf/bin/activate
-
-# Change to the appropriate directory
-cd /home/gomosak/conafor/SEByc/ 
+source "$global_path/env/bin/activate"
 
 last_run=$(ls -d runs/run_* 2>/dev/null | grep -o '[0-9]*' | sort -n | tail -1)
 
@@ -23,9 +21,9 @@ fi
 
 # Ensure the directory gets created
 mkdir -p runs/run_$next_run/
-mkdir -p runs/run_$next_run/npy/
 # Run the Python script with the correct path
 set -e
+
 
 echo "Linear regression start to calculate the missing data herre $global_path/$original_path "
 if ! python3 linear_regression/calculate.py --file_path "$global_path/$original_path" \
