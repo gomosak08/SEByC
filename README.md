@@ -98,7 +98,8 @@ python calculo_biomasa_carbono.py --original_path <original_data_path> --output_
 
 If you prefer to run all the steps at once, you can execute the ```calculate.sh``` script. This script automates the entire workflow, from data preparation to final calculations. Keep in mind that the process may take some time, depending on your computer’s performance and the size of your dataset.
 
-To use the ```calculate.sh``` script, provide the CSV path containing the data you want to use for biomass and carbon calculations.
+To use the ```calculate.sh``` script, provide the CSV path containing the data you want to use for biomass and carbon calculations.Make sure you are in the virtual environment where you installed the `requirements.txt` dependencies.
+
 
 ├── csvs        
 │   └── modelos2.csv       
