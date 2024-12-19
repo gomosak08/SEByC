@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import argparse
-from conditions import assign_equations, volumen, assign_den
+from conditions import assign_equations, volumen, assign_den, densidad_descriptions, carbono_descriptions, biomasa_descriptions
 from tqdm import tqdm
 
 def main(args):
@@ -53,20 +53,20 @@ def main(args):
     # Separate data based on 'condicion' type for volume calculations
     df_original_muerto = df_original[df_original.condicion == "Muerto"]
     df_original_tocon = df_original[df_original.condicion == "Tocón"]
+
     v_eq = volumen(df_original_muerto, df_original_tocon, modelos, n)
 
-    #print(v_eq)
     # Process biomass equations for 'Vivo' data
     data = df_original[df_original.condicion == "Vivo"]
     eq = modelos[(modelos["variable_resultado"] == "b") & (modelos["activo"] == 1)]
     print(len(data))
-    b_eq = assign_equations(data, eq, vector=b_eq, conditions="biomasa")
+    b_eq, criterio_biomasa = assign_equations(data, eq, vector=b_eq, conditions="biomasa")
 
     # Assign biomass equations for 'Muerto' and 'Tocón' conditions using custom logic
     for row in tqdm(df_original_muerto.itertuples(), total=len(df_original_muerto)):
         index = row.Index
-        b_eq[index] = modelos.iloc[2883, 6]
-
+        eq = modelos.iloc[2883, 6]
+        b_eq[index] = f'{eq} * [p]'
     for row in tqdm(df_original_tocon.itertuples(), total=len(df_original_tocon)):
         index = row.Index
         if not np.isnan(row.grado_putrefaccion):
@@ -74,16 +74,17 @@ def main(args):
             eq += f"/{row.grado_putrefaccion} * [p]"
             b_eq[index] = eq
         else:
-            b_eq[index] = modelos.iloc[2884, 6]
+            eq = modelos.iloc[2884, 6]
+            b_eq[index] = f'{eq} * [p]'
     print("done biomasa")
 
     # Assign carbon equations based on specific conditions
     eq = modelos[(modelos["variable_resultado"] == "c") & (modelos["activo"] == 1) & (modelos["Funciones"] == "fraciones de carbono")]
-    c_eq = assign_equations(df_original, eq, vector=c_eq, conditions="carbono")
+    c_eq, criterio_carbon = assign_equations(df_original, eq, vector=c_eq, conditions="carbono")
     
     # Assign density equations
     eq = modelos[(modelos["variable_resultado"] == "p") & (modelos["activo"] == 1)]
-    p_eq = assign_den(df_original, eq, vector=p_eq)
+    p_eq, criterio_den = assign_den(df_original, eq, vector=p_eq)
 
     print(p_eq[-10:])
 
@@ -92,6 +93,16 @@ def main(args):
     df_original.loc[:,"biomasa_eq"] = b_eq
     df_original.loc[:,"densidad_eq"] = p_eq
     df_original.loc[:,"volumen_eq"] = v_eq
+
+    df_original.loc[:,"criterio_den"] = criterio_den
+    df_original["criterios_densidad"] = df_original["criterio_den"].map(densidad_descriptions)
+    df_original.loc[:,"criterio_carbon"] = criterio_carbon
+    df_original["criterios_carbono"] = df_original["criterio_carbon"].map(carbono_descriptions)
+    df_original.loc[:,"criterio_biomasa"] = criterio_biomasa
+    df_original["criterios_biomasa"] = df_original["criterio_biomasa"].map(biomasa_descriptions)
+
+
+
 
 
     # Save the processed dataframe to CSV

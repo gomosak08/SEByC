@@ -1,0 +1,21 @@
+agregar columna numero de ciclo
+Falta columna upmed 
+agregar columna diametro estandarizado 
+
+biomasa muerto y tocones
+1000 * (p * v)
+columna con que criterio de asignacion
+status posibles errores 
+area basal vivos y muertos a nivel registro en metros 
+########################
+Orden sugerido
+ciclo	anio_levantamiento	clave_arbolado	upmid	idconglomerado	sitio	numero_arbol	numero_tallo	tallos	condicion	grado_putrefaccion	familia	genero	epiteto	diametro	altura	diametro_estandarizado	altura_estandarizada	clave_ecoregion_n1	clave_ecoregion_n2	clave_ecoregion_n3	clave_ecoregion_n4	v_id	v_nivel	v_criterios_asignacion	volumen_m3	ecuacion_volumen	p_id	p_nivel	p_criterios_asignacion	densidad	b_id	b_nivel	b_criterios_asignacion	biomasa_kg	ecuacion_biomasa	c_id	c_nivel	c_criterios_asignacion	car
+
+####
+numero de arboles sitio, conglomerado
+####
+
+
+diciembre 10
+condicion putrefaccion
+hacer merge a niverl registro, con los registros que coincidan conglomerado, sitio, arbolo, numero tallo 

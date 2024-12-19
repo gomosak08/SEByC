@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import argparse
-from funtions import calculate_values
+from funtions import calculate_values, area_basal
 
 def main(args):
     """
@@ -17,13 +17,14 @@ def main(args):
 
     # Load the original data and the model equations
     df = pd.read_csv(args.origina_path, low_memory=False)
-    #modelos = pd.read_csv(args.modelo_path)
-
+    n = len(df)
 
     # Apply calculations for biomass, volume, and carbon based on model equations
     df = calculate_values(df, ["biomasa", "volumen", "carbono"])
 
-    # Save the processed DataFrame to CSV
+    df.loc[:, "area_basal_m2"] = area_basal(df,n)
+
+    # Save the processed DataFrame to CSVs
     df.to_csv(args.output_file, index=False)
     print(f"The dataframe was saved in {args.output_file}")
 

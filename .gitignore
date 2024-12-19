@@ -1,4 +1,5 @@
 *.csv
+*.zip
 csvs/**/*.csv
 /*.csv
 csvs/**/*.xlsx

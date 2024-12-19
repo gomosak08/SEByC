@@ -1,8 +1,8 @@
 import numpy as np
-import pandas as pd
 from tqdm import tqdm
 import re
 import warnings
+import math
 warnings.filterwarnings("ignore")
 
 def assign_equations(df, equations, vector=None, conditions=None):
@@ -45,56 +45,59 @@ def assign_equations(df, equations, vector=None, conditions=None):
 
     # Initialize an array to store the equations
     p_eq = vector
+    criterio = np.empty(len(p_eq), dtype=object)
 
     # Iterate over each row in the main dataframe
     #for index, row in df.iterrows():
     for row in tqdm(df.itertuples(), total=len(df)):
         index = row.Index
         flag = False
-        for condition in conditions_eq:
+        for i,condition in enumerate(conditions_eq):
             # Apply the condition to filter equations
             equation_df = condition(equations, row)
             if not equation_df.empty:
                 if (equation_df['Funciones'] == 'alometrica').any():
-                    equation_df['Funciones'].isin(['alometrica']).idxmax() 
+                    #equation_df['Funciones'].isin(['alometrica']).idxmax() 
                     equation = equation_df.loc[equation_df['Funciones'].isin(['alometrica']).idxmax()]
                     p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
                     flag = True
+                    criterio[index] = i 
                     break
                 equation = find_max_criteria_row(equation_df)
                 # If a match is found, assign the equation and break
                 p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
                 flag = True
+                criterio[index] = i 
                 break
         if not flag:
             # Print the index if no condition matched
             print(f"No match found for index: {index}")
             print(condition)
             break
-    return p_eq
-
+    return p_eq,criterio
 
 
 
 def assign_den(df, equations, vector=None):
     conditions_eq = densidad
     p_eq = vector
+    criterio = np.empty(len(p_eq), dtype=object)
     for row in tqdm(df.itertuples(), total=len(df)):
         index = row.Index
         flag = False
-        for condition in conditions_eq:
+        for i,condition in enumerate(conditions_eq):
             equation_df = condition(equations, row)
             if not equation_df.empty:
-                #print(index, p_eq)
                 equation = equation_df.iloc[0]
                 p_eq[index] = equation.ecuacion_php  # The 6th column is selected here
+                criterio[index] = i 
                 flag = True
                 break
         if not flag:
             # Print the index if no condition matched
             print(f"No match found for index: {index}")
             p_eq[index] = "0.5"
-    return p_eq
+    return p_eq, criterio
 
 
 
@@ -186,7 +189,6 @@ def volumen(df_muerto, df_tocon, modelos, lon):
 
     # Initialize the result array with the size of both dataframes combined
     v_eq = np.empty(lon, dtype=object)
-
     # Process the df_muerto dataframe
     for index, row in df_muerto.iterrows():
         v_eq[index] = modelos.iloc[2883, 6]
@@ -371,3 +373,55 @@ densidad = [
 ]
 
 
+biomasa_descriptions = {
+    0: "genero,epiteto,clave_ecoregion,clave_bur,rango_diametro",
+    1: "genero,epiteto,clave_ecoregion,rango_diametro",
+    2: "genero,epiteto,clave_bur,rango_diametro",
+    3: "genero,epiteto,rango_diametro",
+    4: "genero,epiteto_nulo,clave_ecoregion,clave_bur,rango_diametro",
+    5: "genero,epiteto_nulo,clave_ecoregion,rango_diametro",
+    6: "genero,epiteto_nulo,clave_bur,rango_diametro",
+    7: "genero,epiteto_nulo,rango_diametro",
+    8: "genero,clave_ecoregion,clave_bur,rango_diametro",
+    9: "genero,clave_ecoregion,rango_diametro",
+    10: "genero,clave_bur,rango_diametro",
+    11: "genero,rango_diametro",
+    12: "clave_ecoregion,clave_bur,rango_diametro",
+    13: "clave_ecoregion,rango_diametro",
+    14: "clave_bur,rango_diametro",
+    15: "condicion_vivo,tipo_general",
+    16: "condicion_muerto,tipo_general"
+}
+
+carbono_descriptions = {
+    0: "genero,epiteto,clave_ecoregion,clave_bur,diametro_min_mayor_igual,diametro_max_mayor_igual",
+    1: "genero,epiteto,clave_ecoregion,rango_diametro",
+    2: "genero,epiteto,clave_bur,rango_diametro",
+    3: "genero,epiteto,rango_diametro",
+    4: "genero,epiteto_nulo,clave_ecoregion,clave_bur,rango_diametro",
+    5: "genero,epiteto_nulo,clave_ecoregion,rango_diametro",
+    6: "genero,epiteto_nulo,clave_bur,rango_diametro",
+    7: "genero,epiteto_nulo,rango_diametro",
+    8: "genero,clave_ecoregion,clave_bur,rango_diametro",
+    9: "genero,clave_ecoregion,rango_diametro",
+    10: "genero,clave_bur,rango_diametro",
+    11: "genero,rango_diametro",
+    12: "genero,epiteto,diametro_min_nulo,diametro_max_nulo",
+    13: "genero,epiteto_nulo,diametro_min_nulo,diametro_max_nulo",
+    14: "genero,diametro_min_nulo,diametro_max_nulo",
+    15: "familia,genero_nulo,epiteto_nulo",
+    16: "clave_ecoregion,clave_bur,rango_diametro",
+    17: "clave_ecoregion,rango_diametro",
+    18: "clave_bur,rango_diametro",
+    19: "clave_ecoregion,clave_bur,diametro_min_nulo,diametro_max_nulo",
+    20: "clave_ecoregion,diametro_min_nulo,diametro_max_nulo",
+    21: "clave_bur,diametro_min_nulo,diametro_max_nulo",
+    22: "id_998"
+}
+
+densidad_descriptions = {
+    0: "genero,epiteto",
+    1: "genero,epiteto_nulo",
+    2: "genero",
+    3: "clave_ecoregion"
+}

@@ -147,3 +147,106 @@ def calculate_values(df, calculate=["volumen", "biomasa", "carbono"]):
                 print(f"Error calculating carbon at index {index}: {e}")
 
     return df
+
+
+def area_basal(df, n):
+    """
+    Calculate the basal area for each row in a DataFrame.
+
+    Parameters:
+    ----------
+    df : pandas.DataFrame
+        A DataFrame containing the column `diametro` (diameter in centimeters).
+        Each row represents an individual observation.
+    n : int
+        The total number of rows or entries in the DataFrame.
+
+    Returns:
+    -------
+    numpy.ndarray
+        An array of length `n` where each element corresponds to the basal area 
+        calculated for the respective row in the DataFrame. The basal area is 
+        computed using the formula: 
+            π * ( (diameter / 100) / 2 )²
+
+    Notes:
+    -----
+    - The function assumes the `diametro` column exists in the input DataFrame `df`.
+    - The returned values are in square meters.
+    - The `tqdm` library is used to display a progress bar during iteration.
+    - The `math` and `numpy` libraries are required for the computations.
+    - Indexes in `df` must align with the range of `n`.
+
+    Example:
+    -------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from tqdm import tqdm
+    >>> import math
+
+    >>> data = {'diametro': [30, 40, 50]}
+    >>> df = pd.DataFrame(data)
+    >>> n = len(df)
+    >>> basal_areas = area_basal(df, n)
+    >>> print(basal_areas)
+    [0.07068583470577035, 0.12566370614359174, 0.19634954084936207]
+    """
+    print("Calculating area basal")
+    v_eq = np.empty(n, dtype=object)
+
+    for row in tqdm(df.itertuples(), total=len(df)):
+        index = row.Index
+        v_eq[index] = math.pi * ((((row.diametro) / 100) / 2) ** 2)
+    return v_eq
+
+def status(df, n):
+    """
+    Validate the status of biomass and carbon data for each row in a DataFrame.
+
+    Parameters:
+    ----------
+    df : pandas.DataFrame
+        A DataFrame containing the columns `biomasa` and `carbon`. Each row represents
+        an individual observation.
+    n : int
+        The total number of rows or entries in the DataFrame.
+
+    Returns:
+    -------
+    numpy.ndarray
+        An array of length `n` where each element contains the status for the 
+        corresponding row in the DataFrame. The status is determined as follows:
+        - "Calculated" if both `biomasa` and `carbon` are NaN.
+        - "Error" otherwise.
+
+    Notes:
+    -----
+    - The function assumes the `biomasa` and `carbon` columns exist in the input DataFrame `df`.
+    - The `tqdm` library is used to display a progress bar during iteration.
+    - The `math.isnan()` function is used to check for NaN values.
+    - The `numpy` library is required for creating the output array.
+
+    Example:
+    -------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from tqdm import tqdm
+    >>> import math
+
+    >>> data = {'biomasa': [float('nan'), 20.5, float('nan')],
+    ...         'carbon': [float('nan'), 10.5, 15.0]}
+    >>> df = pd.DataFrame(data)
+    >>> n = len(df)
+    >>> status_array = status(df, n)
+    >>> print(status_array)
+    ['Calculated', 'Error', 'Error']
+    """
+    v_eq = np.empty(n, dtype=object)
+    print("Validating status")
+    for row in tqdm(df.itertuples(), total=len(df)):
+        index = row.Index
+        if math.isnan(row.biomasa) and math.isnan(row.carbon):
+            v_eq[index] = "Calculated"
+        else:
+            v_eq[index] = "Error"
+    return v_eq
