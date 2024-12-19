@@ -94,6 +94,23 @@ Run the `calculo_biomasa_carbono.py` script to calculate biomass and carbon for 
 ```bash
 python calculo_biomasa_carbono.py --original_path <original_data_path> --output_file <output_file_path>
 ```
+
+### **Spliting csv**
+#### **How to Use**
+Run the Script `split_csv.py` Use the command line to run the script and pass the required arguments:
+```bash
+python script_name.py "../csvs/arboles.csv" "arboles_1000_head.csv" 2015 2020
+```
+**Arguments:**
+
+- input_path: Path to the input CSV file (e.g., "../csvs/arboles.csv").
+- output_path: Path to save the filtered CSV file (e.g., "arboles_1000_head.csv").
+- start_year: Start of the year range for filtering (e.g., 2015).
+- end_year: End of the year range for filtering (e.g., 2020).
+
+**Output:**
+
+The filtered CSV file will be saved at the path specified by output_path.
 ### Automating the Process
 
 If you prefer to run all the steps at once, you can execute the ```calculate.sh``` script. This script automates the entire workflow, from data preparation to final calculations. Keep in mind that the process may take some time, depending on your computer’s performance and the size of your dataset.
